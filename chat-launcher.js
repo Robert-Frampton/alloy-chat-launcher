@@ -170,7 +170,7 @@ YUI().use(
 						var instance = this,
 							conferenceTopic,
 							uri = ['skype:'],
-							topic = node.attr('data-chattopic'),
+							topic = node.attr('data-chattopic') || node.html(),
 							userData = node.attr('data-chatlauncher');
 
 						if (userData.match(',')) {
