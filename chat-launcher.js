@@ -255,18 +255,21 @@ YUI().use(
 					_setHideHandler: function(popover) {
 						var instance = this;
 
-						instance._hideHandler = popover.get('boundingBox').on(
-							'touchendoutside',
-							function(event) {
-								var target = event.target;
+						if (!instance._hideHandler) {
+							instance._hideHandler = popover.get('boundingBox').on(
+								'touchendoutside',
+								function(event) {
+									var target = event.target;
 
-								if (!target.hasAttribute('data-chatlauncher') && !target.ancestor('.popover', true, 'body')) {
-									instance._hidePopover();
+									if (!target.hasAttribute('data-chatlauncher') && !target.ancestor('.popover', true, 'body')) {
+										instance._hidePopover();
 
-									instance._hideHandler.detach();
+										instance._hideHandler.detach();
+										instance._hideHandler = null;
+									}
 								}
-							}
-						);
+							);
+						}
 					},
 
 					_syncPopover: function(event) {
@@ -282,8 +285,6 @@ YUI().use(
 
 							popover.set('bodyContent', content);
 
-							instance._setHideHandler(popover);
-
 							instance._activeId = triggerId;
 
 							event.halt();
@@ -295,6 +296,8 @@ YUI().use(
 						else {
 							popover.show();
 						}
+
+						instance._setHideHandler(popover);
 					},
 
 					_syncPopoverHandler: function(event) {
