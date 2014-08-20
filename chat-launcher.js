@@ -2,7 +2,7 @@ YUI().use(
 	'aui-base',
 	'aui-popover',
 	'event-outside',
-	'event-touch',
+	'event-tap',
 	function (A) {
 		var Lang = A.Lang,
 
@@ -79,19 +79,13 @@ YUI().use(
 						var instance = this,
 							triggers = instance._triggers;
 
-						var syncPopeverEvent = MOBILE ? 'touchend' : 'mouseenter';
+						var syncPopeverEvent = MOBILE ? 'tap' : 'mouseenter';
 
 						if (triggers) {
-							triggers.on(
-								syncPopeverEvent,
-								A.bind(instance._syncPopoverHandler, instance)
-							);
+							triggers.on(syncPopeverEvent, A.bind(instance._syncPopoverHandler, instance));
 
 							if (!MOBILE) {
-								triggers.on(
-									'mouseleave',
-									A.bind(instance._onLinkMouseLeave, instance)
-								);
+								triggers.on('mouseleave', A.bind(instance._onLinkMouseLeave, instance));
 							}
 						}
 					},
@@ -258,14 +252,18 @@ YUI().use(
 						instance._triggers = triggers;
 					},
 
-					_setHideHandler: function(trigger) {
+					_setHideHandler: function(popover) {
 						var instance = this;
 
-						instance._hideHandler = trigger.on(
+						instance._hideHandler = popover.get('boundingBox').on(
 							'touchendoutside',
 							function(event) {
-								if (!event.target.hasAttribute('data-chatlauncher')) {
+								var target = event.target;
+
+								if (!target.hasAttribute('data-chatlauncher') && !target.ancestor('.popover', true, 'body')) {
 									instance._hidePopover();
+
+									instance._hideHandler.detach();
 								}
 							}
 						);
@@ -284,7 +282,7 @@ YUI().use(
 
 							popover.set('bodyContent', content);
 
-							instance._setHideHandler(currentTarget);
+							instance._setHideHandler(popover);
 
 							instance._activeId = triggerId;
 
