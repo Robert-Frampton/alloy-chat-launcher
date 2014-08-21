@@ -42,7 +42,7 @@ YUI().use(
 							sms: instance._getSMSURI
 						};
 
-						var chatLinkData = [
+						var chatLinkConfig = [
 							{
 								client: 'skype',
 								type: 'chat'
@@ -54,7 +54,7 @@ YUI().use(
 						];
 
 						if (MOBILE) {
-							chatLinkData.push(
+							chatLinkConfig.push(
 								{
 									client: 'sms',
 									type: 'text (SMS)'
@@ -62,7 +62,7 @@ YUI().use(
 							);
 						}
 
-						instance._chatLinkData = chatLinkData;
+						instance._chatLinkConfig = chatLinkConfig;
 
 						instance._renderTriggerUI();
 
@@ -102,21 +102,30 @@ YUI().use(
 						}
 					},
 
-					_getChatLink: function(node, chatLinkData) {
+					_getChatLink: function(chatLinkData, chatLinkConfig) {
 						var instance = this,
-							type = chatLinkData.type,
-							URIFn = instance._chatURIFnMap[chatLinkData.client];
+							client = chatLinkConfig.client,
+							type = chatLinkConfig.type,
+							URIFn = instance._chatURIFnMap[client];
 
-						var href = URIFn(node, chatLinkData);
+						var href = URIFn(chatLinkData, chatLinkConfig);
 
 						return Lang.sub(
 							TPL_CHAT_LINK,
 							{
 								href: href,
-								style: (chatLinkData.client === 'skype') ? STYLE_SKYPE_LINK : STYLE_SMS_LINK,
+								style: (client === 'skype') ? STYLE_SKYPE_LINK : STYLE_SMS_LINK,
 								type: type.charAt(0).toUpperCase() + type.slice(1)
 							}
 						);
+					},
+
+					_getLinkData: function(node) {
+						return {
+							number: node.attr('data-chatnumber'),
+							topic: node.attr('data-chattopic') || node.html(),
+							users: node.attr('data-chatlauncher')
+						};
 					},
 
 					_getPopover: function(node) {
@@ -147,35 +156,37 @@ YUI().use(
 						return popover;
 					},
 
-					_getPopoverBodyContent: function(node, chatLinkData) {
+					_getPopoverBodyContent: function(node) {
 						var instance = this,
+							chatLinkConfig = instance._chatLinkConfig,
+							chatLinkData = instance._getLinkData(node),
 							content = [];
 
-						for (var i = 0; i < chatLinkData.length; i++) {
-							if ((chatLinkData[i].client !== 'sms') || (node.attr('data-chatnumber') !== '')) {
-								content.push(instance._getChatLink(node, chatLinkData[i]));
+						for (var i = 0; i < chatLinkConfig.length; i++) {
+							if ((chatLinkConfig[i].client !== 'sms') || (chatLinkData.number !== '')) {
+								content.push(instance._getChatLink(chatLinkData, chatLinkConfig[i]));
 							}
 						}
 
 						return content.join('');
 					},
 
-					_getSkypeURI: function(node, chatLinkData) {
+					_getSkypeURI: function(chatLinkData, chatLinkConfig) {
 						var instance = this,
 							conferenceTopic,
+							topic = chatLinkData.topic,
 							uri = ['skype:'],
-							topic = node.attr('data-chattopic') || node.html(),
-							userData = node.attr('data-chatlauncher');
+							users = chatLinkData.users;
 
-						if (userData.match(',')) {
-							userData = userData.replace(/,/g, ';');
+						if (users.match(',')) {
+							users = users.replace(/,/g, ';');
 
 							if (topic != 'false') {
 								conferenceTopic = topic;
 							}
 						}
 
-						uri.push(userData + '?' + chatLinkData.type);
+						uri.push(users + '?' + chatLinkConfig.type);
 
 						if (conferenceTopic) {
 							uri.push('&topic=' + encodeURI(conferenceTopic));
@@ -184,8 +195,8 @@ YUI().use(
 						return uri.join('');
 					},
 
-					_getSMSURI: function(node) {
-						return 'sms:' + node.attr('data-chatnumber');
+					_getSMSURI: function(chatLinkData) {
+						return 'sms:' + chatLinkData.number;
 					},
 
 					_hidePopover: function() {
@@ -281,7 +292,7 @@ YUI().use(
 						if (triggerId != instance._activeId) {
 							popover.set('align.node', currentTarget);
 
-							var content = instance._getPopoverBodyContent(currentTarget, instance._chatLinkData);
+							var content = instance._getPopoverBodyContent(currentTarget);
 
 							popover.set('bodyContent', content);
 
