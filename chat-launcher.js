@@ -373,11 +373,13 @@ YUI().use(
 						}
 
 						if (!popover.get('rendered')) {
-							popover.render().align();
+							popover.render();
 						}
 						else {
 							popover.show();
 						}
+
+						popover.align();
 
 						instance._setHideHandler(popover);
 					},
