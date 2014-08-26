@@ -305,7 +305,7 @@ YUI().use(
 					},
 
 					_isPhoneNumber: function(users) {
-						return A.Lang.isNumber(parseInt(users));
+						return Lang.isNumber(parseInt(users));
 					},
 
 					_onLinkMouseLeave: function(event) {
