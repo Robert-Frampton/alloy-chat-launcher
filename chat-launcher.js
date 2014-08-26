@@ -23,6 +23,11 @@ YUI().use(
 
 			TPL_CHAT_LINK = '<a href="{href}" style="display: block; padding: 5px;">{type}</a>',
 
+			TPL_CHAT_LINK_GROUP = '<div>' +
+				'<div style="border-bottom: 1px solid #DDD; color: #AAA; padding-bottom: 3px;">{label}:</div>' +
+				'{chatLinks}' +
+			'</div>',
+
 			TPL_TRIGGER = '<a class="{cssClass}" href="javascript:;" id="{id}" data-chatlauncher="{chatLauncher}">{content}</a>';
 
 		var ChatLauncher = A.Component.create(
@@ -109,25 +114,26 @@ YUI().use(
 
 					_getChatLinkGroup: function(chatLinkConfig) {
 						var instance = this,
-							groupContent = ['<div>'],
+							content = [],
 							label = instance._getChatLinkGroupLabel(chatLinkConfig);
-
-						groupContent.push('<div style="border-bottom: 1px solid #DDD; color: #AAA; padding-bottom: 3px;">');
-						groupContent.push(label + ':</div>');
 
 						var types = instance._getChatLinkTypes(chatLinkConfig.client, chatLinkConfig.users);
 
 						for (var i = 0; i < types.length; i++) {
 							chatLinkConfig.type = types[i];
 
-							groupContent.push(
+							content.push(
 								instance._getChatLink(chatLinkConfig)
 							);
 						}
 
-						groupContent.push('</div>');
-
-						return groupContent.join('');
+						return Lang.sub(
+							TPL_CHAT_LINK_GROUP,
+							{
+								label: label,
+								chatLinks: content.join('')
+							}
+						);
 					},
 
 					_getChatLinkGroupLabel: function(chatLinkConfig) {
