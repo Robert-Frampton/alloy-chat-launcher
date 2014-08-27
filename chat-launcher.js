@@ -188,7 +188,7 @@ YUI().use(
 							popover = instance._popover;
 
 						if (!popover) {
-							var popover = new A.Popover(
+							popover = new A.Popover(
 								{
 									align: {
 										points: [A.WidgetPositionAlign.LC, A.WidgetPositionAlign.RC]
@@ -309,7 +309,7 @@ YUI().use(
 					},
 
 					_onLinkMouseLeave: function(event) {
-						var instance = this
+						var instance = this;
 
 						instance._hidePopoverTask();
 					},
