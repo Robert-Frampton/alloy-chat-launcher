@@ -1,0 +1,18 @@
+{
+  "name": "alloy-chat-launcher",
+  "description": "Alloy Chat Launcher",
+  "version": "0.0.0",
+  "author": "Robert Frampton",
+  "main": "chat-launcher.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liferay/alloy-chat-launcher.git"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.7",
+    "gulp-jshint": "^1.8.4",
+    "gulp-rename": "^1.2.0",
+    "gulp-rimraf": "^0.1.0",
+    "gulp-uglify": "^0.3.2"
+  }
+}
