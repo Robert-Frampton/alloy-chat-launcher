@@ -251,7 +251,6 @@ YUI().use(
 							}
 						}
 
-
 						return content.join('');
 					},
 
@@ -317,7 +316,7 @@ YUI().use(
 					_renderTriggerUI: function() {
 						var instance = this;
 
-						var triggers = A.all('[data-chatlauncher],[data-chatnumber]');
+						var triggers = A.all('[data-chatlauncher], [data-chatnumber]');
 
 						triggers.each(
 							function(item, index) {
