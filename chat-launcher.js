@@ -108,11 +108,20 @@ YUI().use(
 
 					_emailGroupLabelFn: function() {
 						var instance = this,
-							chatLinkData = instance._chatLinkData;
+							chatLinkData = instance._chatLinkData,
+							label,
+							name = chatLinkData.html;
 
+						if (name) {
+							label = name;
 
+							label+= ' (' + chatLinkData.email + ')';
+						}
+						else {
+							label = chatLinkData.email;
+						}
 
-						return chatLinkData.email;
+						return label;
 					},
 
 					_emailURIFn: function(type) {
@@ -260,7 +269,7 @@ YUI().use(
 					_renderTriggerUI: function() {
 						var instance = this;
 
-						var triggers = A.all('[data-chatlauncher], [data-chatnumber]');
+						var triggers = A.all('[data-chatemail], [data-chatlauncher], [data-chatnumber]');
 
 						triggers.each(
 							function(item, index) {
@@ -274,16 +283,22 @@ YUI().use(
 
 									var anchor = A.Node.create(Lang.sub(TPL_TRIGGER, itemAttrs));
 
-									var chatTopic = item.attr('data-chattopic');
+									var chatEmail = item.attr('data-chatemail');
 
-									if (chatTopic) {
-										anchor.attr('data-chattopic', chatTopic);
+									if (chatEmail) {
+										anchor.attr('data-chatemail', chatEmail);
 									}
 
 									var chatNumber = item.attr('data-chatnumber');
 
 									if (chatNumber) {
 										anchor.attr('data-chatnumber', chatNumber);
+									}
+
+									var chatTopic = item.attr('data-chattopic');
+
+									if (chatTopic) {
+										anchor.attr('data-chattopic', chatTopic);
 									}
 
 									item.replace(anchor);
