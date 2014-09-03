@@ -237,6 +237,21 @@ YUI().use(
 						return content.join('');
 					},
 
+					_getSkypeUserData: function(skypeType) {
+						var instance = this,
+							chatLinkData = instance._chatLinkData,
+							userData;
+
+						if (skypeType) {
+							userData = chatLinkData.users;
+						}
+						else {
+							userData = chatLinkData.number;
+						}
+
+						return userData;
+					},
+
 					_hasMultipleParticipants: function(users) {
 						return users.match(',');
 					},
@@ -258,6 +273,13 @@ YUI().use(
 						if (!instance._hidePopoverTimeout) {
 							instance._hidePopoverTimeout = A.later(300, instance, instance._hidePopover);
 						}
+					},
+
+					_isSkypeUserName: function() {
+						var instance = this,
+							client = instance._currentClient;
+
+						return (client === 'skype');
 					},
 
 					_onLinkMouseLeave: function(event) {
@@ -357,17 +379,9 @@ YUI().use(
 					_skypeGroupLabelFn: function() {
 						var instance = this,
 							chatLinkData = instance._chatLinkData,
-							client = instance._currentClient,
 							label = TPL_SKYPE_ICON + ' ',
-							userData,
-							userName = (client === 'skype');
-
-						if (userName) {
-							userData = chatLinkData.users;
-						}
-						else {
-							userData = chatLinkData.number;
-						}
+							userName = instance._isSkypeUserName(),
+							userData = instance._getSkypeUserData(userName);
 
 						if (instance._hasMultipleParticipants(userData)) {
 							if (userName) {
@@ -394,17 +408,17 @@ YUI().use(
 							conferenceTopic,
 							topic = chatLinkData.topic,
 							uri = ['skype:'],
-							users = chatLinkData.users;
+							userData = instance._getSkypeUserData(instance._isSkypeUserName());
 
-						if (instance._hasMultipleParticipants(users)) {
-							users = users.replace(/,/g, ';');
+						if (instance._hasMultipleParticipants(userData)) {
+							userData = userData.replace(/,/g, ';');
 
 							if (topic != 'false') {
 								conferenceTopic = topic;
 							}
 						}
 
-						uri.push(users + '?' + type);
+						uri.push(userData + '?' + type);
 
 						if (conferenceTopic) {
 							uri.push('&topic=' + encodeURI(conferenceTopic));
