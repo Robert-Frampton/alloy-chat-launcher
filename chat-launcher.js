@@ -239,6 +239,10 @@ YUI().use(
 						return content.join('');
 					},
 
+					_getPopoverHeaderContent: function(chatLinkData) {
+						return chatLinkData.displayName || chatLinkData.html || null;
+					},
+
 					_getSkypeUserData: function(skypeType) {
 						var instance = this,
 							chatLinkData = instance._chatLinkData,
@@ -380,18 +384,13 @@ YUI().use(
 
 					_skypeGroupLabelFn: function() {
 						var instance = this,
-							chatLinkData = instance._chatLinkData,
 							label = TPL_SKYPE_ICON + ' ',
 							userName = instance._isSkypeUserName(),
 							userData = instance._getSkypeUserData(userName);
 
 						if (instance._hasMultipleParticipants(userData)) {
 							if (userName) {
-								var topic = chatLinkData.topic;
-
-								topic = (topic && topic !== 'false') ? topic : chatLinkData.html;
-
-								label+= instance._adjustLabelCase(topic);
+								label+= 'Usernames';
 							}
 							else {
 								label+= 'Phone Numbers';
@@ -450,7 +449,7 @@ YUI().use(
 								{
 									'align.node': currentTarget,
 									bodyContent: instance._getPopoverBodyContent(chatLinkData),
-									headerContent: (chatLinkData.displayName || null)
+									headerContent: instance._getPopoverHeaderContent(chatLinkData)
 								}
 							);
 
