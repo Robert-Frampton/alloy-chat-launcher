@@ -55,8 +55,6 @@ YUI().use(
 					initializer: function(config) {
 						var instance = this;
 
-						A.Event.defineOutside('touchend');
-
 						instance._renderTriggerUI();
 
 						instance._bindTriggerUI();
@@ -205,6 +203,9 @@ YUI().use(
 
 							if (!MOBILE) {
 								instance._bindPopoverUI(popover);
+							}
+							else {
+								A.Event.defineOutside('touchend');
 							}
 
 							instance._popover = popover;
