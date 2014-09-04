@@ -107,21 +107,9 @@ YUI().use(
 					},
 
 					_emailGroupLabelFn: function() {
-						var instance = this,
-							chatLinkData = instance._chatLinkData,
-							label,
-							name = chatLinkData.html;
+						var instance = this;
 
-						if (name) {
-							label = name;
-
-							label+= ' (' + chatLinkData.email + ')';
-						}
-						else {
-							label = chatLinkData.email;
-						}
-
-						return label;
+						return instance._chatLinkData.email;
 					},
 
 					_emailURIFn: function(type) {
