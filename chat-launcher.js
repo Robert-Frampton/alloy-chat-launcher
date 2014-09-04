@@ -21,7 +21,7 @@ YUI().use(
 				'{chatLinks}' +
 			'</div>',
 
-			TPL_TRIGGER = '<a class="{cssClass}" href="javascript:;" id="{id}" data-chatlauncher="{chatLauncher}">{content}</a>';
+			TPL_TRIGGER = '<a class="{cssClass}" href="javascript:;" id="{id}" data-displayname="{displayName}" data-chatemail="{email}" data-chatlauncher="{users}" data-chatnumber="{number}" data-chattopic="{topic}">{html}</a>';
 
 		var ChatLauncher = A.Component.create(
 			{
@@ -291,31 +291,18 @@ YUI().use(
 							function(item, index) {
 								if (instance._validateTag(item)) {
 									var itemAttrs = {
-										chatLauncher: item.attr('data-chatlauncher'),
-										content: item.html(),
 										cssClass: item.attr('class'),
 										id: item.attr('id')
 									};
 
-									var anchor = A.Node.create(Lang.sub(TPL_TRIGGER, itemAttrs));
+									var chatLinkData = instance._getChatLinkData(item);
 
-									var chatEmail = item.attr('data-chatemail');
-
-									if (chatEmail) {
-										anchor.attr('data-chatemail', chatEmail);
-									}
-
-									var chatNumber = item.attr('data-chatnumber');
-
-									if (chatNumber) {
-										anchor.attr('data-chatnumber', chatNumber);
-									}
-
-									var chatTopic = item.attr('data-chattopic');
-
-									if (chatTopic) {
-										anchor.attr('data-chattopic', chatTopic);
-									}
+									var anchor = A.Node.create(
+										Lang.sub(
+											TPL_TRIGGER,
+											A.mix(itemAttrs, chatLinkData)
+										)
+									);
 
 									item.replace(anchor);
 
