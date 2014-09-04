@@ -149,6 +149,23 @@ YUI().use(
 						);
 					},
 
+					_getChatLinkData: function(node) {
+						var instance = this;
+
+						var chatLinkData = {
+							displayName: node.attr('data-displayname'),
+							email: node.attr('data-chatemail'),
+							html: node.html(),
+							number: node.attr('data-chatnumber'),
+							topic: node.attr('data-chattopic'),
+							users: node.attr('data-chatlauncher')
+						};
+
+						instance._chatLinkData = chatLinkData;
+
+						return chatLinkData;
+					},
+
 					_getChatLinkGroup: function(client) {
 						var instance = this,
 							content = [],
@@ -168,22 +185,6 @@ YUI().use(
 								chatLinks: content.join('')
 							}
 						);
-					},
-
-					_getLinkData: function(node) {
-						var instance = this;
-
-						var chatLinkData = {
-							email: node.attr('data-chatemail'),
-							html: node.html(),
-							number: node.attr('data-chatnumber'),
-							topic: node.attr('data-chattopic'),
-							users: node.attr('data-chatlauncher')
-						};
-
-						instance._chatLinkData = chatLinkData;
-
-						return chatLinkData;
 					},
 
 					_getPopover: function(node) {
@@ -212,11 +213,9 @@ YUI().use(
 						return popover;
 					},
 
-					_getPopoverBodyContent: function(node) {
+					_getPopoverBodyContent: function(chatLinkData) {
 						var instance = this,
-							chatLinkData = instance._getLinkData(node),
-							content = [],
-							topic = chatLinkData.topic;
+							content = [];
 
 						if (chatLinkData.users) {
 							content.push(instance._getChatLinkGroup('skype'));
@@ -441,14 +440,16 @@ YUI().use(
 							popover = instance._getPopover(),
 							triggerId = currentTarget.guid();
 
-						instance._activeTrigger = currentTarget;
-
 						if (triggerId != instance._activeId) {
-							popover.set('align.node', currentTarget);
+							var chatLinkData = instance._getChatLinkData(currentTarget);
 
-							var content = instance._getPopoverBodyContent(currentTarget);
-
-							popover.set('bodyContent', content);
+							popover.setAttrs(
+								{
+									'align.node': currentTarget,
+									bodyContent: instance._getPopoverBodyContent(chatLinkData),
+									headerContent: (chatLinkData.displayName || null)
+								}
+							);
 
 							instance._activeId = triggerId;
 
