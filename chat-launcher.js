@@ -33,7 +33,7 @@ YUI().use(
 			TPL_CHAT_LINK = '<a href="{href}" style="display: block; padding: 5px;">{type}</a>',
 
 			TPL_CHAT_LINK_GROUP = '<div>' +
-				'<div style="border-bottom: 1px solid #DDD; color: #AAA; min-width: 100px; padding-bottom: 3px;">{label}:</div>' +
+				'<div style="border-bottom: 1px solid #DDD; color: #AAA; min-width: 100px; padding-bottom: 3px;">{icon} {label}:</div>' +
 				'{chatLinks}' +
 			'</div>',
 
@@ -47,6 +47,7 @@ YUI().use(
 
 				prototype: {
 					EMAIL_SCHEMA: {
+						groupIcon: TPL_EMAIL_ICON,
 						groupIconTemplate: SVG_EMAIL_ICON,
 						groupLabelFn: '_emailGroupLabelFn',
 						types: ['email'],
@@ -54,6 +55,7 @@ YUI().use(
 					},
 
 					SKYPE_NUMBER_SCHEMA: {
+						groupIcon: TPL_SKYPE_ICON,
 						groupIconTemplate: SVG_SKYPE_ICON,
 						groupLabelFn: '_skypeGroupLabelFn',
 						types: ['sms', 'call'],
@@ -61,6 +63,7 @@ YUI().use(
 					},
 
 					SKYPE_SCHEMA: {
+						groupIcon: TPL_SKYPE_ICON,
 						groupIconTemplate: SVG_SKYPE_ICON,
 						groupLabelFn: '_skypeGroupLabelFn',
 						types: ['chat', 'call'],
@@ -68,6 +71,7 @@ YUI().use(
 					},
 
 					SMS_SCHEMA: {
+						groupIcon: TPL_SMS_ICON,
 						groupIconTemplate: SVG_SMS_ICON,
 						groupLabelFn: '_SMSGroupLabelFn',
 						types: ['sms'],
@@ -129,13 +133,13 @@ YUI().use(
 					_emailGroupLabelFn: function() {
 						var instance = this,
 							email = instance._chatLinkData.email,
-							label = TPL_EMAIL_ICON + ' ';
+							label;
 
 						if (instance._hasMultipleParticipants(email)) {
-							label+= 'Email';
+							label = 'Email';
 						}
 						else {
-							label+= email;
+							label = email;
 						}
 
 						return label;
@@ -213,8 +217,9 @@ YUI().use(
 						return Lang.sub(
 							TPL_CHAT_LINK_GROUP,
 							{
-								label: label,
-								chatLinks: content.join('')
+								chatLinks: content.join(''),
+								icon: schema.groupIcon,
+								label: label
 							}
 						);
 					},
@@ -422,20 +427,20 @@ YUI().use(
 
 					_skypeGroupLabelFn: function() {
 						var instance = this,
-							label = TPL_SKYPE_ICON + ' ',
+							label,
 							userName = instance._isSkypeUserName(),
 							userData = instance._getSkypeUserData(userName);
 
 						if (instance._hasMultipleParticipants(userData)) {
 							if (userName) {
-								label+= 'Usernames';
+								label = 'Usernames';
 							}
 							else {
-								label+= 'Phone Numbers';
+								label = 'Phone Numbers';
 							}
 						}
 						else {
-							label+= userData;
+							label = userData;
 						}
 
 						return label;
@@ -467,7 +472,7 @@ YUI().use(
 					},
 
 					_SMSGroupLabelFn: function() {
-						return TPL_SMS_ICON + ' SMS (Native)';
+						return 'SMS (Native)';
 					},
 
 					_SMSURIFn: function(type) {
