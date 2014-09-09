@@ -33,8 +33,13 @@ YUI().use(
 			TPL_CHAT_LINK = '<a href="{href}" style="display: block; padding: 5px;">{type}</a>',
 
 			TPL_CHAT_LINK_GROUP = '<div>' +
-				'<div style="border-bottom: 1px solid #DDD; color: #AAA; min-width: 100px; padding-bottom: 3px;">{icon} {label}:</div>' +
+				'<div class="group-label" data-users="{userData}" style="border-bottom: 1px solid #DDD; color: #AAA; cursor: pointer; min-width: 100px; padding-bottom: 3px;">{icon} {label}:</div>' +
 				'{chatLinks}' +
+			'</div>',
+
+			TPL_POPOVER_OVERLAY = '<div class="popover-overlay" style="background-color: #FFF; border-radius: 5px; bottom: 0; left: 0; opacity: 0.95; padding: 7px; position: absolute; right: 0; top: 0;">' +
+				'<span class="close">&times;</span>' +
+				'<div class="popover-overlay-content"></div>' +
 			'</div>',
 
 			TPL_TRIGGER = '<a class="{cssClass}" href="javascript:;" id="{id}" data-displayname="{displayName}" data-chatemail="{email}" data-chatlauncher="{users}" data-chatnumber="{number}" data-chattopic="{topic}">{html}</a>';
@@ -51,7 +56,8 @@ YUI().use(
 						groupIconTemplate: SVG_EMAIL_ICON,
 						groupLabelFn: '_emailGroupLabelFn',
 						types: ['email'],
-						URIFn: '_emailURIFn'
+						URIFn: '_emailURIFn',
+						userData: 'email'
 					},
 
 					SKYPE_NUMBER_SCHEMA: {
@@ -59,7 +65,8 @@ YUI().use(
 						groupIconTemplate: SVG_SKYPE_ICON,
 						groupLabelFn: '_skypeGroupLabelFn',
 						types: ['sms', 'call'],
-						URIFn: '_skypeURIFn'
+						URIFn: '_skypeURIFn',
+						userData: 'number'
 					},
 
 					SKYPE_SCHEMA: {
@@ -67,7 +74,8 @@ YUI().use(
 						groupIconTemplate: SVG_SKYPE_ICON,
 						groupLabelFn: '_skypeGroupLabelFn',
 						types: ['chat', 'call'],
-						URIFn: '_skypeURIFn'
+						URIFn: '_skypeURIFn',
+						userData: 'users'
 					},
 
 					MOBILE_SCHEMA: {
@@ -75,7 +83,8 @@ YUI().use(
 						groupIconTemplate: SVG_MOBILE_ICON,
 						groupLabelFn: '_mobileGroupLabelFn',
 						types: ['sms', 'call'],
-						URIFn: '_mobileURIFn'
+						URIFn: '_mobileURIFn',
+						userData: 'number'
 					},
 
 					initializer: function(config) {
@@ -98,9 +107,27 @@ YUI().use(
 					},
 
 					_bindPopoverUI: function(popover) {
-						var instance = this;
+						var instance = this,
+							boundingBox = popover.get('boundingBox');
 
-						popover.get('boundingBox').on('mouseleave', instance._hidePopoverTask, instance);
+						if (!MOBILE) {
+							boundingBox.on('mouseleave', instance._hidePopoverTask, instance);
+						}
+						else {
+							A.Event.defineOutside('touchend');
+						}
+
+						boundingBox.delegate(
+							'click',
+							function(event) {
+								var userData = event.currentTarget.attr('data-users');
+
+								if (userData) {
+									instance._setPopoverOverlayContent(userData.replace(/,/g, ', '));
+								}
+							},
+							'.group-label[data-users]'
+						);
 					},
 
 					_bindTriggerUI: function() {
@@ -221,7 +248,8 @@ YUI().use(
 							{
 								chatLinks: content.join(''),
 								icon: schema.groupIcon,
-								label: label
+								label: label,
+								userData: instance._chatLinkData[schema.userData]
 							}
 						);
 					},
@@ -242,12 +270,7 @@ YUI().use(
 								}
 							);
 
-							if (!MOBILE) {
-								instance._bindPopoverUI(popover);
-							}
-							else {
-								A.Event.defineOutside('touchend');
-							}
+							instance._bindPopoverUI(popover);
 
 							instance._popover = popover;
 						}
@@ -282,6 +305,27 @@ YUI().use(
 						return chatLinkData.displayName || chatLinkData.html || null;
 					},
 
+					_getPopoverOverlay: function() {
+						var instance = this,
+							popoverOverlay = instance._popoverOverlay;
+
+						if (!popoverOverlay) {
+							var popover = instance._popover;
+
+							popoverOverlay = A.Node.create(TPL_POPOVER_OVERLAY);
+
+							boundingBox = popover.get('boundingBox');
+
+							boundingBox.append(popoverOverlay);
+
+							instance._popoverOverlay = popoverOverlay;
+
+							boundingBox.one('.close').on('click', A.bind('_hidePopoverOverlay', instance));
+						}
+
+						return popoverOverlay;
+					},
+
 					_getSkypeUserData: function(skypeType) {
 						var instance = this,
 							chatLinkData = instance._chatLinkData,
@@ -309,6 +353,17 @@ YUI().use(
 
 						if (!popover.get('boundingBox').test(':hover')) {
 							popover.hide();
+
+							instance._hidePopoverOverlay();
+						}
+					},
+
+					_hidePopoverOverlay: function() {
+						var instance = this,
+							popoverOverlay = instance._popoverOverlay;
+
+						if (popoverOverlay) {
+							popoverOverlay.hide();
 						}
 					},
 
@@ -445,6 +500,16 @@ YUI().use(
 								}
 							);
 						}
+					},
+
+					_setPopoverOverlayContent: function(content) {
+						var instance = this,
+							popoverOverlay = instance._getPopoverOverlay(),
+							popoverOverlayContent = popoverOverlay.one('.popover-overlay-content');
+
+						popoverOverlayContent.html(content).show();
+
+						popoverOverlay.show();
 					},
 
 					_skypeGroupLabelFn: function() {
