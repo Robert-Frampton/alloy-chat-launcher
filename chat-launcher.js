@@ -37,7 +37,7 @@ YUI().use(
 				'{chatLinks}' +
 			'</div>',
 
-			TPL_POPOVER_OVERLAY = '<div class="popover-overlay" style="background-color: #FFF; border-radius: 5px; bottom: 0; left: 0; opacity: 0.95; padding: 7px; position: absolute; right: 0; top: 0;">' +
+			TPL_POPOVER_OVERLAY = '<div class="popover-overlay" style="background-color: #FFF; border-radius: 5px; bottom: 0; left: 0; opacity: 0.95; overflow: auto; padding: 7px; position: absolute; right: 0; top: 0;">' +
 				'<span class="close">&times;</span>' +
 				'<div class="popover-overlay-content"></div>' +
 			'</div>',
@@ -574,6 +574,8 @@ YUI().use(
 									headerContent: instance._getPopoverHeaderContent(chatLinkData)
 								}
 							);
+
+							instance._hidePopoverOverlay();
 
 							instance._activeId = triggerId;
 
